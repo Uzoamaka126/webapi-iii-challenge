@@ -82,15 +82,13 @@ function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
-    const fullRequestBody = Object.keys(req.body).length;
-    const fullRequestBodyName = Object.keys(req.body.name).length;
-    if (!fullRequestBody) {
+    if (!Object.keys(req.body).length) {
         res.status(400).json({
-            message: 'Missing user data'
+            message: 'Missing user data!'
         })
-    } else if(!fullRequestBodyName) {
+    } else if(!req.body.name.length) {
         res.status(400).json({
-            message: 'Missing required name field'
+            message: 'Missing required name field!'
         })
     } else {
         next();
@@ -98,13 +96,11 @@ function validateUser(req, res, next) {
 };
 
 function validatePost(req, res, next) {
-    const fullRequestBody = Object.keys(req.body).length;
-    const fullRequestBodyText = Object.keys(req.body.text).length;
-    if (!fullRequestBody) {
+    if (!Object.keys(req.body).length) {
         res.status(400).json({
             message: 'Missing post data'
         })
-    } else if(!fullRequestBodyText) {
+    } else if(!Object.keys(req.body.text).length) {
         res.status(400).json({
             message: 'Missing required text field'
         })
