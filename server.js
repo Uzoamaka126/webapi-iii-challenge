@@ -9,7 +9,7 @@ server.use(helmet());
 server.use(express.json());
 server.use(logger);
 
-server.use('/ap', postRouter);
+server.use('/api/posts', postRouter);
 server.use('/api/users', userRouter);
 
 server.get('/', (req, res) => {
