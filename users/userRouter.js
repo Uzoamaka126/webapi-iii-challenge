@@ -21,13 +21,16 @@ router.post('/', validateUser, (req, res) => {
 
 // Create a new post if user id is verified
 router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
-    const postInfo = { 
-        ...req.body, 
-        user_id: req.params.id 
-    };
+    // const postInfo = { 
+    //     ...req.body, 
+    //     user_id: req.params.id 
+    // };
     
     Posts
-        .insert(postInfo)
+        .insert({ 
+            ...req.body, 
+            user_id: req.params.id 
+        })
         .then(post => {
             return res.status(201).json(post);
         })
@@ -78,13 +81,32 @@ router
 // Delete a user
 router
     .delete('/:id', validateUserId, (req, res) => {
-
+        Users.remove(req.user.id)
+            .then(() => {
+                // throw new Error
+                res.status(200).json({
+                    message: "This user has been deleted"
+                });
+            })
+            .catch(error => {
+                res.status(500).json({
+                    message: "Error deleting user" + error.message
+                });
+            })
 });
 
 // Edit details of a particular user
 router
-    .put('/:id', (req, res) => {
-
+    .put('/:id', validateUserId, (req, res) => {
+        Users.update(req.hub.id, req.body)
+            .then(user => {
+                res.status(200).json(user);
+            })
+            .catch(error => {
+                res.status(500).json({
+                    message: 'Error updating user data' + error.message
+                })
+            })
 });
 
 //custom middleware
@@ -140,7 +162,7 @@ function validateUser(req, res, next) {
 
 function validatePost(req, res, next) {
     if (!Object.keys(req.body).length) {
-        res.status(400).json({
+        return res.status(400).json({
             message: 'Missing post data'
         })
     } if(!req.body.text) {
