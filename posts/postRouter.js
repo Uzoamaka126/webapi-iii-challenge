@@ -1,6 +1,7 @@
-const express = 'express';
-const router = express.Router();
+const express = require('express');
 const Posts = require('./postDb');
+const router = express.Router();
+
 
 // Get all Posts
 router.get('/', (req, res) => {
@@ -21,7 +22,7 @@ router.get('/:id', [validatePostId], (req, res) => {
     Posts.getById(req.params.id)
         .then(post => {
             if(post) {
-                res.status(200).json(user);
+                res.status(200).json(post);
             } else {
                 res.status(404).json({
                     message: "User not found"
@@ -38,7 +39,7 @@ router.get('/:id', [validatePostId], (req, res) => {
 
 // Delete a selected post
 router.delete('/:id', [validatePostId], (req, res) => {
-    const { id } = req/params;
+    const { id } = req.params;
     Posts.remove(id)
         .then(count => {
             if(count > 0) {
@@ -59,7 +60,7 @@ router.delete('/:id', [validatePostId], (req, res) => {
         });
 });
 
-router.put('/:id', [validatePostId], (req, res) => {
+router.put('/:id/posts/:id', [validatePostId], (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     Posts.update(id, updates)
@@ -71,14 +72,14 @@ router.put('/:id', [validatePostId], (req, res) => {
                 });
             } else {
                 res.status(404).json({
-                    message: 'The Post could not be found' + err.message
+                    message: 'The Post could not be found'
                 })
             }
         })
         .catch(err => {
             console.log(err);
             res.status(500).json({
-                message: 'Error updating the post' + err.message
+                message: 'Error updating the post'
             });
         });
 });
@@ -102,6 +103,20 @@ function validatePostId(req, res, next) {
                 message: 'Something came up when we were checking for the post id' + error.message,
             });
         });
-};
+}
+
+function validatePost(req, res, next) {
+    if (!Object.keys(req.body).length) {
+        res.status(400).json({
+            message: 'Missing post data'
+        })
+    } else if(!Object.keys(req.body.text).length) {
+        res.status(400).json({
+            message: 'Missing required text field'
+        })
+    } else {
+        next();
+    }
+}
 
 module.exports = router;
